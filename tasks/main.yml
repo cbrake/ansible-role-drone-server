@@ -1,0 +1,30 @@
+- name: install docker python SDK
+  package:
+    name: python-docker
+    state: present
+
+- name: created needed directories for drone
+  file:
+    path: "{{ item }}"
+    state: "directory"
+  with_items:
+    - /etc/drone
+    - /var/lib/drone/drone.sqlite
+
+- name: create config file for drone server
+  copy:
+    content: "{{ drone_server_env }}"
+    dest: "/etc/drone/server-env"
+  register: drone_server_config
+
+- name: start drone
+  docker_container:
+    name: drone-server
+    image: drone/drone:1
+    env_file: /etc/drone/server-env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/drone:/data
+    published_ports:
+      - 8000:80
+    restart_policy: always
