@@ -20,7 +20,8 @@
 - name: start drone
   docker_container:
     name: drone-server
-    image: drone/drone:1
+    image: drone/drone:{{ drone_version }}
+    pull: true
     env_file: /etc/drone/server-env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
